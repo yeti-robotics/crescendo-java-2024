@@ -7,6 +7,7 @@ import com.ctre.phoenix6.controls.MotionMagicVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.util.sendable.Sendable;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -22,7 +23,7 @@ public class PivotSubsystem extends SubsystemBase {
 
     public final TalonFX pivotMotor;
     public final CANcoder pivotEncoder;
-    private final StatusSignal<Double> pivotPositionStatusSignal;
+    private final StatusSignal<Angle> pivotPositionStatusSignal;
     public DigitalInput forwardLimitSwitch;
     public DigitalInput reverseLimitSwitch;
 
@@ -48,8 +49,8 @@ public class PivotSubsystem extends SubsystemBase {
         public static final Slot0Configs SLOT_0_CONFIGS = new Slot0Configs().withKP(PIVOT_P).withKI(PIVOT_I).withKD(PIVOT_D).
                 withKA(PIVOT_A).withKV(PIVOT_V).withKG(PIVOT_G).withGravityType(GravityTypeValue.Arm_Cosine);
 
-        public static final CurrentLimitsConfigs PIVOT_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentThreshold(55).
-                withSupplyCurrentLimit(65).withSupplyTimeThreshold(0.1).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
+        public static final CurrentLimitsConfigs PIVOT_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).
+                withSupplyCurrentLimit(65).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
 
         public static final SoftwareLimitSwitchConfigs PIVOT_SOFT_LIMIT = new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(true).withForwardSoftLimitThreshold(
                 .53
@@ -129,7 +130,7 @@ public class PivotSubsystem extends SubsystemBase {
         var pivotEncoder1Configurator = pivotEncoder.getConfigurator();
         var cancoderConfiguration = new CANcoderConfiguration();
 
-        cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         cancoderConfiguration.MagnetSensor.MagnetOffset = PivotConstants.MAGNET_OFFSET;
         cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         pivotEncoder1Configurator.apply(cancoderConfiguration);
@@ -153,15 +154,15 @@ public class PivotSubsystem extends SubsystemBase {
             pivotPositionStatusSignal.waitForUpdate(PivotConstants.PIVOT_POSITION_STATUS_FRAME);
         }
 
-        return pivotPositionStatusSignal.getValue();
+        return pivotPositionStatusSignal.getValue().magnitude();
     }
 
     private void setPivotPosition(PivotConstants.PivotPosition pivotPosition) {
         PivotConstants.pivotSetPosition = pivotPosition;
 
         MotionMagicVoltage motionMagicControlRequest = new MotionMagicVoltage(
-                pivotPosition.getPosition(), true, 0, 0,
-                false, false, false)
+                pivotPosition.getPosition()
+        )
                 .withLimitForwardMotion(getForwardLimitSwitch())
                 .withLimitReverseMotion(getReverseLimitSwitch())
                 .withSlot(0).withUpdateFreqHz(200);
@@ -184,7 +185,7 @@ public class PivotSubsystem extends SubsystemBase {
     }
 
     public double getEncoderAngle() {
-        return pivotEncoder.getAbsolutePosition().getValue();
+        return pivotEncoder.getAbsolutePosition().getValue().magnitude();
     }
 
     public Command moveUp(double speed) {

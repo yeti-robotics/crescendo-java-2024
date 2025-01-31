@@ -38,7 +38,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         public static final double ELEVATOR_POSITION_STATUS_FRAME = 0.05;
         public static final double ELEVATOR_VELOCITY_STATUS_FRAME = 0.01;
 
-        public static final CurrentLimitsConfigs ELEVATOR_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentThreshold(65).withSupplyCurrentLimit(75).withSupplyTimeThreshold(1).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(75);
+        public static final CurrentLimitsConfigs ELEVATOR_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).withSupplyCurrentLimit(75).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(75);
         public static final SoftwareLimitSwitchConfigs ELEVATOR_SOFT_LIMIT = new SoftwareLimitSwitchConfigs().withForwardSoftLimitEnable(false).withForwardSoftLimitThreshold(0).withReverseSoftLimitEnable(false).withReverseSoftLimitThreshold(0);
 
         public enum ElevatorPositions {
@@ -93,8 +93,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private void setPosition(ElevatorConstants.ElevatorPositions position) {
         elevatorPosition = position;
         MotionMagicExpoVoltage motionMagicVoltage = new MotionMagicExpoVoltage(
-                position.distanceEl, true, 0.0, 0,
-                true, false, false);
+                position.distanceEl
+        );
         if (position == ElevatorConstants.ElevatorPositions.AMP) {
             motionMagicVoltage.withFeedForward(10);
         }

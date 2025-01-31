@@ -6,8 +6,8 @@ import frc.robot.subsystems.drivetrain.generated.TunerConstants;
 
 public final class AutoConstants {
 
-    public static final double MAX_SPEED = TunerConstants.kSpeedAt12VoltsMps;
-    public static final double MAX_ACCEL = TunerConstants.kSpeedAt12VoltsMps;
+    public static final double MAX_SPEED = TunerConstants.kSpeedAt12Volts.magnitude();
+    public static final double MAX_ACCEL = TunerConstants.kSpeedAt12Volts.magnitude();
     public static final double MAX_THETA_VELOCITY =  MAX_SPEED / Math.hypot(22.25 / 2, 22.25 / 2);
     public static final double MAX_THETA_ACCEL = MAX_SPEED / Math.hypot(22.25 / 2, 22.25 / 2);
     public static final PathConstraints DEFAULT_CONSTRAINTS = new PathConstraints(

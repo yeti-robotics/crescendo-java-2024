@@ -4,15 +4,12 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,7 +17,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.ShuttleAimCommand;
@@ -44,13 +42,12 @@ public class RobotContainer {
     public final CommandXboxController joystick = new CommandXboxController(1); // My joystick
     public final VisionSubsystem vision = new VisionSubsystem();
 
-    final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+    final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.1)
             .withRotationalDeadband(CommandSwerveDrivetrain.MaFxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
 
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     public ControllerContainer controllerContainer = new ControllerContainer();
     public SendableChooser<AutoConstants.AutoMode> autoChooser;
     ButtonHelper buttonHelper = new ButtonHelper(controllerContainer.getControllers());
@@ -81,16 +78,16 @@ public class RobotContainer {
         );
 
 
-        if (Utils.isSimulation()) {
-            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-        }
+//        if (Utils.isSimulation()) {
+//            drivetrain.seedFieldCentric(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+//        }
         Telemetry logger = new Telemetry(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND);
-        drivetrain.registerTelemetry(logger::telemeterize);
+//        drivetrain.registerTelemetry(logger::telemeterize);
 
         configureBindings();
 
-        buildAutoChooser();
-        rebuildAutoIfNecessary();
+//        buildAutoChooser();
+//        rebuildAutoIfNecessary();
 
         vision.ledOff();
 
@@ -122,9 +119,9 @@ public class RobotContainer {
                         () ->
                                 drive
                                         // +X in velocity = forward, -Y in joystick = forward
-                                        .withVelocityX(-joystick.getLeftY() * TunerConstants.kSpeedAt12VoltsMps)
+                                        .withVelocityX(-joystick.getLeftY() * TunerConstants.kSpeedAt12Volts.magnitude())
                                         // +Y in velocity = left, -X in joystick = left
-                                        .withVelocityY(-joystick.getLeftX() * TunerConstants.kSpeedAt12VoltsMps)
+                                        .withVelocityY(-joystick.getLeftX() * TunerConstants.kSpeedAt12Volts.magnitude())
                                         // +rotational rate = counterclockwise (left), -X in joystick = left
                                         .withRotationalRate(-joystick.getRightX() * CommandSwerveDrivetrain.MaFxAngularRate)
                 ));
@@ -140,7 +137,7 @@ public class RobotContainer {
         joystick.x().onTrue(robotCommands.stowAmp());
 
         // Reset the field-centric heading
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldRelative));
+        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         // Suck in note
         joystick.rightBumper().whileTrue(intake.rollIn(.7));
