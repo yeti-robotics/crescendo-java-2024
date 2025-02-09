@@ -64,7 +64,7 @@ public class RobotCommands {
                 arm.moveUpAndStop(.5).until(() ->
                         arm.getEnc() >= ArmSubsystem.ArmConstants.ARM_HANDOFF_POSITION).andThen(
                         shooter.spinFeederAndStop(-0.3).alongWith(intake.rollOut(-0.15))
-                ).until(shooter::getBeamBreak)
+                )
         );
     }
 
