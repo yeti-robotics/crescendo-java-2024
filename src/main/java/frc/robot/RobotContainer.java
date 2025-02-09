@@ -126,9 +126,8 @@ public class RobotContainer {
                                         .withRotationalRate(-joystick.getRightX() * CommandSwerveDrivetrain.MaFxAngularRate)
                 ));
 
-        // Lock on to speaker
-        joystick.leftTrigger().whileTrue(new AutoAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShooterState())));
-
+        // Hardcode to a fine shooting angle
+        joystick.leftTrigger().whileTrue(pivot.adjustPivotPositionTo(0.46).alongWith(shooter.setVelocityAndStop(125)));
         // Lock on to shuttle target
         joystick.y().whileTrue(new ShuttleAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShuttleState())));
 

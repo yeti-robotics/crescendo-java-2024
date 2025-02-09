@@ -63,7 +63,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
         public static final int SHOOTER_NEO = 16;
-        public static final int BEAM_BREAK = 0;
+        public static final int BEAM_BREAK = 5;
 
         public static InterpolatingTreeMap<Double, ShooterStateData> SHOOTER_MAP() {
             InterpolatingTreeMap<Double, ShooterStateData> map = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterStateData.interpolator);
@@ -123,7 +123,7 @@ public class ShooterSubsystem extends SubsystemBase {
         leftVel.refresh();
         rightVel.refresh();
 
-        SmartDashboard.putData("shooter beam break", beamBreak);
+        SmartDashboard.putBoolean("shooter beam break", getBeamBreak());
         SmartDashboard.putNumber("left rps:", leftVel.getValue().magnitude());
         SmartDashboard.putNumber("right rps:", rightVel.getValue().magnitude());
     }

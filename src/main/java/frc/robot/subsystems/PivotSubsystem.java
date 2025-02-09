@@ -147,6 +147,8 @@ public class PivotSubsystem extends SubsystemBase {
 
         SmartDashboard.putNumber("Pivot pos:", getPivotPosition());
 
+        SmartDashboard.putBoolean("Forward limit", getForwardLimitSwitch());
+        SmartDashboard.putBoolean("Reverse Limit", getReverseLimitSwitch());
     }
 
     public double getPivotPosition() {
