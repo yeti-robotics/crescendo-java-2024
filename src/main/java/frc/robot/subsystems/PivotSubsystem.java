@@ -87,8 +87,7 @@ public class PivotSubsystem extends SubsystemBase {
                 PivotPosition pivotPosition = PivotPosition.CUSTOM;
                 pivotPosition.position = position;
                 return pivotPosition;
-            }
-        }
+            }                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       }
 
         private static PivotPosition pivotSetPosition = PivotPosition.CUSTOM(0.45);
     }

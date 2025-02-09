@@ -38,7 +38,7 @@ public class AutoAimCommand extends Command {
     public void initialize() {
         currentTag = LimelightHelpers.getFiducialID(VisionSubsystem.VisionConstants.LIMELIGHT_NAME);
 
-        Translation2d speakerCenter = AllianceFlipUtil.apply(
+        Translation2d  speakerCenter = AllianceFlipUtil.apply(
                 Constants.FieldConstants.Speaker.centerSpeakerOpening.toTranslation2d()
         );
 
