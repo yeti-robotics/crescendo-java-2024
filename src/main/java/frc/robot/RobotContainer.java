@@ -41,6 +41,7 @@ public class RobotContainer {
     public final ArmSubsystem arm = new ArmSubsystem();
     public final CommandXboxController joystick = new CommandXboxController(1); // My joystick
     public final VisionSubsystem vision = new VisionSubsystem();
+    SendableChooser<Object> autoChooser = new SendableChooser<>();
 
     final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
@@ -49,7 +50,6 @@ public class RobotContainer {
             .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
 
     public ControllerContainer controllerContainer = new ControllerContainer();
-    public SendableChooser<AutoConstants.AutoMode> autoChooser;
     ButtonHelper buttonHelper = new ButtonHelper(controllerContainer.getControllers());
     private boolean autoNeedsRebuild = true;
     private Command auto;
@@ -172,7 +172,7 @@ public class RobotContainer {
         var visionResult = vision.getTargetingResults();
 
         if (DriverStation.getAlliance().isPresent()) { // this is here because it's sometimes not present during simulation
-            if (visionResult != null && visionResult.valid && Math.abs(drivetrain.getPigeon2().getRate()) < 230) {
+            if (visionResult != null && visionResult.valid && Math.abs(drivetrain.getPigeon2().getDeviceID()) < 230) {
                 Pose2d llPose = visionResult.getBotPose2d_wpiBlue();
                 drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp());
             }
@@ -183,7 +183,6 @@ public class RobotContainer {
         var namedCommands = new AutoNamedCommands(intake, shooter, pivot, arm, robotCommands);
         namedCommands.registerCommands();
 
-        autoChooser = new SendableChooser<>();
 
         for (var autoMode : AutoConstants.AutoMode.values()) {
             autoChooser.addOption(autoMode.name, autoMode);
@@ -199,7 +198,7 @@ public class RobotContainer {
     public void rebuildAutoIfNecessary() {
         if (autoNeedsRebuild) {
             // why is there a timeout here? can't we use the FMS/practice mode timeout?
-            auto = AutoBuilder.buildAuto(autoChooser.getSelected().name).withTimeout(15);
+            auto = AutoBuilder.buildAuto(autoChooser.getSelected().toString()).withTimeout(15);
             System.out.println("AUTO NAME: " + auto);
             autoNeedsRebuild = false;
         }

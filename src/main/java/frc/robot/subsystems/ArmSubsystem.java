@@ -70,18 +70,15 @@ public class ArmSubsystem extends SubsystemBase {
 
 
         talonFXConfiguration.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
-        talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         talonFXConfiguration.MotorOutput.Inverted = ArmConstants.ARM_INVERSION;
         talonFXConfiguration.MotorOutput.NeutralMode = ArmConstants.ARM_NEUTRAL_MODE;
         talonFXConfiguration.FutureProofConfigs = Constants.TalonFXConstants.TALON_FUTURE_PROOF;
         talonFXConfiguration.Feedback.SensorToMechanismRatio = 50; //placeholder
         talonFXConfiguration.Feedback.RotorToSensorRatio = 12.8;
         talonFXConfiguration.CurrentLimits = ArmConstants.ARM_CURRENT_LIMIT;
-        talonFXConfiguration.SoftwareLimitSwitch = ArmConstants.ARM_SOFT_LIMIT;
+        //talonFXConfiguration.SoftwareLimitSwitch = ArmConstants.ARM_SOFT_LIMIT;
         talonFXConfiguration.Slot0 = ArmConstants.SLOT_0_CONFIGS;
-
-        armKraken.getRotorVelocity().waitForUpdate(ArmConstants.ARM_VELOCITY_STATUS_FRAME);
-        armKraken.getRotorPosition().waitForUpdate(ArmConstants.ARM_POSITION_STATUS_FRAME);
 
         armConfigurator.apply(talonFXConfiguration);
 
