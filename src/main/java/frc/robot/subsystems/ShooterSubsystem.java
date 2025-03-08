@@ -97,7 +97,7 @@ public class ShooterSubsystem extends SubsystemBase {
         rightMotorConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         rightMotorConfiguration.CurrentLimits = ShooterConstants.SHOOTER_CURRENT_LIMIT;
         rightMotorConfiguration.Slot0 = ShooterConstants.SLOT_0_CONFIGS;
-        leftKraken.setControl(new Follower(rightKraken.getDeviceID(), true));
+        leftKraken.setControl(new Follower(rightKraken.getDeviceID(), false));
 
         ShooterConstants.shooterStatus = ShooterStatus.OFF;
         ShooterConstants.shooterModes = ShooterModes.TRAP;
@@ -137,7 +137,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     private void spinFeeder(double speed) {
-        neo.set(speed);
+        neo.set(-speed);
     }
 
     public void stopShooter() {
