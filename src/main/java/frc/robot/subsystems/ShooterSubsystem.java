@@ -97,7 +97,7 @@ public class ShooterSubsystem extends SubsystemBase {
         rightMotorConfiguration.MotorOutput.NeutralMode = NeutralModeValue.Coast;
         rightMotorConfiguration.CurrentLimits = ShooterConstants.SHOOTER_CURRENT_LIMIT;
         rightMotorConfiguration.Slot0 = ShooterConstants.SLOT_0_CONFIGS;
-        leftKraken.setControl(new Follower(rightKraken.getDeviceID(), false));
+        leftKraken.setControl(new Follower(rightKraken.getDeviceID(), true));
 
         ShooterConstants.shooterStatus = ShooterStatus.OFF;
         ShooterConstants.shooterModes = ShooterModes.TRAP;
