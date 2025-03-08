@@ -43,7 +43,7 @@ public class ShooterSubsystem extends SubsystemBase {
         public static final int SHOOTER_RIGHT_MOTOR = 15; //id
         public static final CurrentLimitsConfigs SHOOTER_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).
                 withSupplyCurrentLimit(65).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
-        public static final InvertedValue SHOOTER_INVERSION = InvertedValue.CounterClockwise_Positive;
+        public static final InvertedValue SHOOTER_INVERSION = InvertedValue.Clockwise_Positive;
 
         public static final double SHOOTER_P = 0.11;//0.043315
         public static final double SHOOTER_S = 0.25;//0.043315
