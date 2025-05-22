@@ -25,16 +25,16 @@ public class ArmSubsystem extends SubsystemBase {
             public static final double ARM_POSITION_STATUS_FRAME = 0.05;
         public static final double ARM_VELOCITY_STATUS_FRAME = 0.01;
         public static final double ARM_HANDOFF_POSITION = 0.51;
-        public static final double ARM_DEPLOY_UPPER_BOUND = 0.02;
+        public static final double ARM_DEPLOY_UPPER_BOUND = 0.04;
 
         public static final double ARM_P = 0;
         public static final double ARM_I = 0;
         public static final double ARM_D = 0;
-        public static final double ARM_DEPLOY_LOWER_BOUND = 0;
+        public static final double ARM_DEPLOY_LOWER_BOUND = -0.01;
 
         public static final Slot0Configs SLOT_0_CONFIGS = new Slot0Configs().withKP(ARM_P).withKI(ARM_I).withKD(ARM_D).withGravityType(GravityTypeValue.Arm_Cosine);
         public static final CurrentLimitsConfigs ARM_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).
-                withSupplyCurrentThreshold(55).withSupplyCurrentLimit(65).withSupplyTimeThreshold(0.1).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
+                withSupplyCurrentLimit(65).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
 
         public static final SoftwareLimitSwitchConfigs ARM_SOFT_LIMIT = new SoftwareLimitSwitchConfigs().
                 withForwardSoftLimitEnable
@@ -70,25 +70,22 @@ public class ArmSubsystem extends SubsystemBase {
 
 
         talonFXConfiguration.Feedback.FeedbackRemoteSensorID = armEncoder.getDeviceID();
-        talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.RemoteCANcoder;
+        talonFXConfiguration.Feedback.FeedbackSensorSource = FeedbackSensorSourceValue.FusedCANcoder;
         talonFXConfiguration.MotorOutput.Inverted = ArmConstants.ARM_INVERSION;
         talonFXConfiguration.MotorOutput.NeutralMode = ArmConstants.ARM_NEUTRAL_MODE;
         talonFXConfiguration.FutureProofConfigs = Constants.TalonFXConstants.TALON_FUTURE_PROOF;
         talonFXConfiguration.Feedback.SensorToMechanismRatio = 50; //placeholder
         talonFXConfiguration.Feedback.RotorToSensorRatio = 12.8;
         talonFXConfiguration.CurrentLimits = ArmConstants.ARM_CURRENT_LIMIT;
-        talonFXConfiguration.SoftwareLimitSwitch = ArmConstants.ARM_SOFT_LIMIT;
+        //talonFXConfiguration.SoftwareLimitSwitch = ArmConstants.ARM_SOFT_LIMIT;
         talonFXConfiguration.Slot0 = ArmConstants.SLOT_0_CONFIGS;
-
-        armKraken.getRotorVelocity().waitForUpdate(ArmConstants.ARM_VELOCITY_STATUS_FRAME);
-        armKraken.getRotorPosition().waitForUpdate(ArmConstants.ARM_POSITION_STATUS_FRAME);
 
         armConfigurator.apply(talonFXConfiguration);
 
         var armEncoderConfigurator = armEncoder.getConfigurator();
         var cancoderConfiguration = new CANcoderConfiguration();
 
-        cancoderConfiguration.MagnetSensor.AbsoluteSensorRange = AbsoluteSensorRangeValue.Unsigned_0To1;
+        cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         cancoderConfiguration.MagnetSensor.MagnetOffset = ArmConstants.MAGNET_OFFSET;
         cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         armEncoderConfigurator.apply(cancoderConfiguration);
@@ -97,11 +94,11 @@ public class ArmSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        SmartDashboard.putNumber("Arm encoder: ", armEncoder.getAbsolutePosition().getValue());
+        SmartDashboard.putNumber("Arm encoder: ", armEncoder.getAbsolutePosition().getValue().magnitude());
     }
 
     public double getEnc() {
-        return armEncoder.getAbsolutePosition().getValue();
+        return armEncoder.getAbsolutePosition().getValue().magnitude();
     }
 
     public void moveUp(double speed) {

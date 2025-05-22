@@ -1,5 +1,5 @@
 {
-  "version": 1.0,
+  "version": "2025.0",
   "waypoints": [
     {
       "anchor": {
@@ -9,7 +9,7 @@
       "prevControl": null,
       "nextControl": {
         "x": 7.26312459757587,
-        "y": 1.9088663569623863
+        "y": 1.9088663569623865
       },
       "isLocked": false,
       "linkedName": "bypassNoteTwo"
@@ -20,7 +20,7 @@
         "y": 3.548383473371797
       },
       "prevControl": {
-        "x": 3.2580184989185943,
+        "x": 3.258018498918594,
         "y": 0.8080477216589235
       },
       "nextControl": null,
@@ -30,10 +30,12 @@
   ],
   "rotationTargets": [],
   "constraintZones": [],
+  "pointTowardsZones": [],
   "eventMarkers": [
     {
       "name": "hand-off",
       "waypointRelativePos": 0.35,
+      "endWaypointRelativePos": null,
       "command": {
         "type": "parallel",
         "data": {
@@ -53,18 +55,19 @@
     "maxVelocity": 5.0,
     "maxAcceleration": 5.0,
     "maxAngularVelocity": 540.0,
-    "maxAngularAcceleration": 720.0
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 129.61688743683618,
-    "rotateFast": false
+    "rotation": 129.61688743683618
   },
   "reversed": false,
   "folder": "source 4 ",
-  "previewStartingState": {
-    "rotation": -176.90594194108274,
-    "velocity": 0
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
   },
   "useDefaultConstraints": false
 }

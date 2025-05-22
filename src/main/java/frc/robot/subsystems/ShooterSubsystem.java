@@ -11,6 +11,7 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
@@ -28,8 +29,8 @@ public class ShooterSubsystem extends SubsystemBase {
     private final TalonFX neo;
     private final DigitalInput beamBreak;
 
-    private final StatusSignal<Double> leftVel;
-    private final StatusSignal<Double> rightVel;
+    private final StatusSignal<AngularVelocity> leftVel;
+    private final StatusSignal<AngularVelocity> rightVel;
 
     MotionMagicVelocityVoltage motionMagicVelocityVoltage;
 
@@ -41,7 +42,7 @@ public class ShooterSubsystem extends SubsystemBase {
         public static final int SHOOTER_LEFT_MOTOR = 5; //id
         public static final int SHOOTER_RIGHT_MOTOR = 15; //id
         public static final CurrentLimitsConfigs SHOOTER_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).
-                withSupplyCurrentThreshold(55).withSupplyCurrentLimit(65).withSupplyTimeThreshold(0.1).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
+                withSupplyCurrentLimit(65).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
         public static final InvertedValue SHOOTER_INVERSION = InvertedValue.CounterClockwise_Positive;
 
         public static final double SHOOTER_P = 0.11;//0.043315
@@ -62,7 +63,7 @@ public class ShooterSubsystem extends SubsystemBase {
 
 
         public static final int SHOOTER_NEO = 16;
-        public static final int BEAM_BREAK = 0;
+        public static final int BEAM_BREAK = 5;
 
         public static InterpolatingTreeMap<Double, ShooterStateData> SHOOTER_MAP() {
             InterpolatingTreeMap<Double, ShooterStateData> map = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterStateData.interpolator);
@@ -122,9 +123,9 @@ public class ShooterSubsystem extends SubsystemBase {
         leftVel.refresh();
         rightVel.refresh();
 
-        SmartDashboard.putData("shooter beam break", beamBreak);
-        SmartDashboard.putNumber("left rps:", leftVel.getValue());
-        SmartDashboard.putNumber("right rps:", rightVel.getValue());
+        SmartDashboard.putBoolean("shooter beam break", getBeamBreak());
+        SmartDashboard.putNumber("left rps:", leftVel.getValue().magnitude());
+        SmartDashboard.putNumber("right rps:", rightVel.getValue().magnitude());
     }
 
     public boolean getBeamBreak() {
@@ -136,7 +137,7 @@ public class ShooterSubsystem extends SubsystemBase {
     }
 
     private void spinFeeder(double speed) {
-        neo.set(speed);
+        neo.set(-speed);
     }
 
     public void stopShooter() {
@@ -161,7 +162,7 @@ public class ShooterSubsystem extends SubsystemBase {
             rightVel.waitForUpdate(ShooterConstants.SHOOTER_STATUS_FRAME_SECONDS);
         }
 
-        return (leftVel.getValue() + rightVel.getValue()) / 2;
+        return (leftVel.getValue().magnitude() + rightVel.getValue().magnitude()) / 2;
     }
 
     public Command updateVelocityWith(RobotDataPublisher<ShooterStateData> shooterStateDataPublisher) {
@@ -191,6 +192,10 @@ public class ShooterSubsystem extends SubsystemBase {
 
     public Command spinFeederAndStop(double vel) {
         return startEnd(() -> spinFeeder(vel), this::stopFeeder);
+    }
+
+    public Command spinFeederNotRequiring(double vel) {
+        return Commands.startEnd(() -> spinFeeder(vel), this::stopFeeder);
     }
 
     public Command spinFeederMaxAndStop() {

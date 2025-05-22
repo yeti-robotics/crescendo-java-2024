@@ -10,6 +10,51 @@
         "header": {
           "open": true
         }
+      },
+      "Talon FX (v6)[0]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[2]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[2]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[5]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[5]/Fwd Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[5]/Rev Limit": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[5]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[6]": {
+        "header": {
+          "open": true
+        }
+      },
+      "Talon FX (v6)[6]/Rotor Sensor": {
+        "header": {
+          "open": true
+        }
       }
     }
   },

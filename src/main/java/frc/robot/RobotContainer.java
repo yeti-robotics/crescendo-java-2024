@@ -4,15 +4,12 @@
 
 package frc.robot;
 
-import com.ctre.phoenix6.Utils;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.auto.NamedCommands;
 import com.pathplanner.lib.util.PathPlannerLogging;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.GenericHID;
@@ -20,7 +17,8 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj2.command.*;
+import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.AutoAimCommand;
 import frc.robot.commands.ShuttleAimCommand;
@@ -43,16 +41,15 @@ public class RobotContainer {
     public final ArmSubsystem arm = new ArmSubsystem();
     public final CommandXboxController joystick = new CommandXboxController(1); // My joystick
     public final VisionSubsystem vision = new VisionSubsystem();
+    SendableChooser<Object> autoChooser = new SendableChooser<>();
 
-    final CommandSwerveDrivetrain drivetrain = TunerConstants.DriveTrain; // My drivetrain
+    final CommandSwerveDrivetrain drivetrain = TunerConstants.createDrivetrain(); // My drivetrain
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.1)
             .withRotationalDeadband(CommandSwerveDrivetrain.MaFxAngularRate * 0.1) // Add a 10% deadband
             .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
 
-    private final SwerveRequest.PointWheelsAt point = new SwerveRequest.PointWheelsAt();
     public ControllerContainer controllerContainer = new ControllerContainer();
-    public SendableChooser<AutoConstants.AutoMode> autoChooser;
     ButtonHelper buttonHelper = new ButtonHelper(controllerContainer.getControllers());
     private boolean autoNeedsRebuild = true;
     private Command auto;
@@ -81,16 +78,16 @@ public class RobotContainer {
         );
 
 
-        if (Utils.isSimulation()) {
-            drivetrain.seedFieldRelative(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
-        }
+//        if (Utils.isSimulation()) {
+//            drivetrain.seedFieldCentric(new Pose2d(new Translation2d(), Rotation2d.fromDegrees(90)));
+//        }
         Telemetry logger = new Telemetry(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND);
-        drivetrain.registerTelemetry(logger::telemeterize);
+//        drivetrain.registerTelemetry(logger::telemeterize);
 
         configureBindings();
 
-        buildAutoChooser();
-        rebuildAutoIfNecessary();
+//        buildAutoChooser();
+//        rebuildAutoIfNecessary();
 
         vision.ledOff();
 
@@ -113,8 +110,11 @@ public class RobotContainer {
         buttonHelper.createButton(6, 0, shooter.spinFeederAndStop(-.1).alongWith(intake.rollIn(0.5)), MultiButton.RunCondition.WHILE_HELD);
         buttonHelper.createButton(9, 0, elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.AMP).andThen(pivot.moveDown(-0.25).unless(
                         () -> pivot.getEncoderAngle() < 0.4).withTimeout(0.6).andThen(pivot.adjustPivotPositionTo(0.03).unless(() -> !elevator.getMagSwitch()))), MultiButton.RunCondition.WHEN_PRESSED);
-        intake.intakeOccupiedTrigger.onTrue(vision.blinkLimelight().alongWith(successfulIntakeRumble()));
-        intake.intakeOccupiedTrigger.and(joystick.rightBumper().negate()).onTrue(robotCommands.handoff().withTimeout(2));
+        intake.intakeOccupiedTrigger.onTrue(
+                vision.blinkLimelight()
+                        .andThen(robotCommands.handoff())
+                        .alongWith(successfulIntakeRumble()));
+//        intake.intakeOccupiedTrigger.and(joystick.rightBumper().negate()).onTrue(robotCommands.handoff().withTimeout(2));
         buttonHelper.createButton(11, 0, shooter.shooterTrap(), MultiButton.RunCondition.WHILE_HELD);
 
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -122,25 +122,27 @@ public class RobotContainer {
                         () ->
                                 drive
                                         // +X in velocity = forward, -Y in joystick = forward
-                                        .withVelocityX(-joystick.getLeftY() * TunerConstants.kSpeedAt12VoltsMps)
+                                        .withVelocityX(-joystick.getLeftY() * TunerConstants.kSpeedAt12Volts.magnitude())
                                         // +Y in velocity = left, -X in joystick = left
-                                        .withVelocityY(-joystick.getLeftX() * TunerConstants.kSpeedAt12VoltsMps)
+                                        .withVelocityY(-joystick.getLeftX() * TunerConstants.kSpeedAt12Volts.magnitude())
                                         // +rotational rate = counterclockwise (left), -X in joystick = left
                                         .withRotationalRate(-joystick.getRightX() * CommandSwerveDrivetrain.MaFxAngularRate)
                 ));
 
-        // Lock on to speaker
-        joystick.leftTrigger().whileTrue(new AutoAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShooterState())));
+        // Hardcode to a fine shooting angle
+        joystick.leftTrigger().whileTrue(pivot.adjustPivotPositionTo(0.46).alongWith(shooter.setVelocityAndStop(150)).alongWith(shooter.spinFeederNotRequiring(-1)));
+        //         joystick.b().whileTrue(robotCommands.bumpFire());
+        joystick.b().whileTrue(shooter.spinFeederNotRequiring(-1));
+
 
         // Lock on to shuttle target
         joystick.y().whileTrue(new ShuttleAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShuttleState())));
 
         // Swerve lock
-        joystick.b().whileTrue(robotCommands.bumpFire());
         joystick.x().onTrue(robotCommands.stowAmp());
 
         // Reset the field-centric heading
-        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldRelative));
+        joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
         // Suck in note
         joystick.rightBumper().whileTrue(intake.rollIn(.7));
@@ -160,7 +162,8 @@ public class RobotContainer {
         // (These are also unassigned on the gamepad map?)
         joystick.povLeft().whileTrue(pivot.moveUpWithBrake(0.05, -0.01));
         joystick.povRight().whileTrue(pivot.moveDownWithBrake(-0.05, 0.01));
-        // Spin feeder
+        // Spin feeder[]
+
     }
 
     //Add haptics to beam break
@@ -176,7 +179,7 @@ public class RobotContainer {
         var visionResult = vision.getTargetingResults();
 
         if (DriverStation.getAlliance().isPresent()) { // this is here because it's sometimes not present during simulation
-            if (visionResult != null && visionResult.valid && Math.abs(drivetrain.getPigeon2().getRate()) < 230) {
+            if (visionResult != null && visionResult.valid && Math.abs(drivetrain.getPigeon2().getDeviceID()) < 230) {
                 Pose2d llPose = visionResult.getBotPose2d_wpiBlue();
                 drivetrain.addVisionMeasurement(llPose, Timer.getFPGATimestamp());
             }
@@ -187,7 +190,6 @@ public class RobotContainer {
         var namedCommands = new AutoNamedCommands(intake, shooter, pivot, arm, robotCommands);
         namedCommands.registerCommands();
 
-        autoChooser = new SendableChooser<>();
 
         for (var autoMode : AutoConstants.AutoMode.values()) {
             autoChooser.addOption(autoMode.name, autoMode);
@@ -203,7 +205,7 @@ public class RobotContainer {
     public void rebuildAutoIfNecessary() {
         if (autoNeedsRebuild) {
             // why is there a timeout here? can't we use the FMS/practice mode timeout?
-            auto = AutoBuilder.buildAuto(autoChooser.getSelected().name).withTimeout(15);
+            auto = AutoBuilder.buildAuto(autoChooser.getSelected().toString()).withTimeout(15);
             System.out.println("AUTO NAME: " + auto);
             autoNeedsRebuild = false;
         }
