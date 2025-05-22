@@ -1,8 +1,9 @@
 package frc.robot.commands;
 
 import com.ctre.phoenix6.StatusCode;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveModule;
-import com.ctre.phoenix6.mechanisms.swerve.SwerveRequest;
+import com.ctre.phoenix6.swerve.SwerveDrivetrain;
+import com.ctre.phoenix6.swerve.SwerveModule;
+import com.ctre.phoenix6.swerve.SwerveRequest;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 
@@ -19,17 +20,18 @@ public class TurnToPoint extends SwerveRequest.FieldCentricFacingAngle {
 
     @Override
     public StatusCode apply(
-            SwerveControlRequestParameters parameters, SwerveModule... modulesToApply) {
+            SwerveDrivetrain.SwerveControlParameters parameters, SwerveModule... modulesToApply) {
         this.TargetDirection = pointToFace.minus(parameters.currentPose.getTranslation()).getAngle();
-        if (ForwardReference == SwerveRequest.ForwardReference.OperatorPerspective) {
-            // This is an angle from the frame of the reference of the field. Subtract
-            // the operator persepctive to counteract CTRE adding it later
-            this.TargetDirection = this.TargetDirection.minus(parameters.operatorForwardDirection);
-        }
+//        if (ForwardPerspectiveValue == SwerveRequest.ForwardPerspectiveValue.OperatorPerspective) {
+//            // This is an angle from the frame of the reference of the field. Subtract
+//            // the operator persepctive to counteract CTRE adding it later
+//            this.TargetDirection = this.TargetDirection.minus(parameters.operatorForwardDirection);
+//        }
         // TODO: Adjust direction we're aiming based on current robot velocity in
         // parameters.currentChassisSpeed
         return super.apply(parameters, modulesToApply);
     }
+
 
     @Override
     public FieldCentricFacingAngle withTargetDirection(Rotation2d targetDirection) {

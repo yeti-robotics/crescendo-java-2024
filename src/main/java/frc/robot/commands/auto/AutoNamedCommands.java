@@ -1,6 +1,7 @@
 package frc.robot.commands.auto;
 
 import com.pathplanner.lib.auto.NamedCommands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import frc.robot.RobotCommands;
@@ -35,7 +36,8 @@ public class AutoNamedCommands {
                 pivotSubsystem.adjustPivotPositionTo(0.53),
                 shooterSubsystem.shooterBumpFire(),
                 new WaitCommand(.75),
-                shooterSubsystem.spinFeederMaxAndStop().alongWith(intakeSubsystem.rollOut(-1).withTimeout(1))
+                shooterSubsystem.spinFeederMaxAndStop().alongWith(intakeSubsystem.rollOut(-1).withTimeout(1)),
+                new InstantCommand(shooterSubsystem::stopShooter)
         ));
 
         NamedCommands.registerCommand("shootLine", new SequentialCommandGroup(
@@ -75,7 +77,8 @@ public class AutoNamedCommands {
                 pivotSubsystem.adjustPivotPositionTo(.55),
                 shooterSubsystem.shooterBumpFire(),
                 new WaitCommand(.75),
-                shooterSubsystem.spinFeederMaxAndStop().alongWith(intakeSubsystem.rollOut(-1).withTimeout(1))
+                shooterSubsystem.spinFeederMaxAndStop().alongWith(intakeSubsystem.rollOut(-1).withTimeout(1)),
+                new InstantCommand(shooterSubsystem::stopShooter)
         ));
 
         NamedCommands.registerCommand("shootBumpLast", new SequentialCommandGroup(

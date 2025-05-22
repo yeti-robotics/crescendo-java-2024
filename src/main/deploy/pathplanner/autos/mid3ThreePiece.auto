@@ -1,12 +1,5 @@
 {
-  "version": 1.0,
-  "startingPose": {
-    "position": {
-      "x": 0.76,
-      "y": 6.6
-    },
-    "rotation": -122.78173264301024
-  },
+  "version": "2025.0",
   "command": {
     "type": "sequential",
     "data": {
@@ -114,6 +107,7 @@
       ]
     }
   },
+  "resetOdom": true,
   "folder": "mid 3 amp side",
   "choreoAuto": false
 }
