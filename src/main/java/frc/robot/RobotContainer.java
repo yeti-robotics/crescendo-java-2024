@@ -110,8 +110,11 @@ public class RobotContainer {
         buttonHelper.createButton(6, 0, shooter.spinFeederAndStop(-.1).alongWith(intake.rollIn(0.5)), MultiButton.RunCondition.WHILE_HELD);
         buttonHelper.createButton(9, 0, elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.AMP).andThen(pivot.moveDown(-0.25).unless(
                         () -> pivot.getEncoderAngle() < 0.4).withTimeout(0.6).andThen(pivot.adjustPivotPositionTo(0.03).unless(() -> !elevator.getMagSwitch()))), MultiButton.RunCondition.WHEN_PRESSED);
-        intake.intakeOccupiedTrigger.onTrue(vision.blinkLimelight().alongWith(successfulIntakeRumble()));
-        intake.intakeOccupiedTrigger.and(joystick.rightBumper().negate()).onTrue(robotCommands.handoff().withTimeout(2));
+        intake.intakeOccupiedTrigger.onTrue(
+                vision.blinkLimelight()
+                        .andThen(robotCommands.handoff())
+                        .alongWith(successfulIntakeRumble()));
+//        intake.intakeOccupiedTrigger.and(joystick.rightBumper().negate()).onTrue(robotCommands.handoff().withTimeout(2));
         buttonHelper.createButton(11, 0, shooter.shooterTrap(), MultiButton.RunCondition.WHILE_HELD);
 
         drivetrain.setDefaultCommand( // Drivetrain will execute this command periodically
@@ -127,12 +130,15 @@ public class RobotContainer {
                 ));
 
         // Hardcode to a fine shooting angle
-        joystick.leftTrigger().whileTrue(pivot.adjustPivotPositionTo(0.46).alongWith(shooter.setVelocityAndStop(125)));
+        joystick.leftTrigger().whileTrue(pivot.adjustPivotPositionTo(0.46).alongWith(shooter.setVelocityAndStop(150)).alongWith(shooter.spinFeederNotRequiring(-1)));
+        //         joystick.b().whileTrue(robotCommands.bumpFire());
+        joystick.b().whileTrue(shooter.spinFeederNotRequiring(-1));
+
+
         // Lock on to shuttle target
         joystick.y().whileTrue(new ShuttleAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShuttleState())));
 
         // Swerve lock
-        joystick.b().whileTrue(robotCommands.bumpFire());
         joystick.x().onTrue(robotCommands.stowAmp());
 
         // Reset the field-centric heading
@@ -156,7 +162,8 @@ public class RobotContainer {
         // (These are also unassigned on the gamepad map?)
         joystick.povLeft().whileTrue(pivot.moveUpWithBrake(0.05, -0.01));
         joystick.povRight().whileTrue(pivot.moveDownWithBrake(-0.05, 0.01));
-        // Spin feeder
+        // Spin feeder[]
+
     }
 
     //Add haptics to beam break

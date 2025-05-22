@@ -25,12 +25,12 @@ public class ArmSubsystem extends SubsystemBase {
             public static final double ARM_POSITION_STATUS_FRAME = 0.05;
         public static final double ARM_VELOCITY_STATUS_FRAME = 0.01;
         public static final double ARM_HANDOFF_POSITION = 0.51;
-        public static final double ARM_DEPLOY_UPPER_BOUND = 0.02;
+        public static final double ARM_DEPLOY_UPPER_BOUND = 0.04;
 
         public static final double ARM_P = 0;
         public static final double ARM_I = 0;
         public static final double ARM_D = 0;
-        public static final double ARM_DEPLOY_LOWER_BOUND = 0;
+        public static final double ARM_DEPLOY_LOWER_BOUND = -0.01;
 
         public static final Slot0Configs SLOT_0_CONFIGS = new Slot0Configs().withKP(ARM_P).withKI(ARM_I).withKD(ARM_D).withGravityType(GravityTypeValue.Arm_Cosine);
         public static final CurrentLimitsConfigs ARM_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).

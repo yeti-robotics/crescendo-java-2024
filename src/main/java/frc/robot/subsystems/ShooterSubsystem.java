@@ -194,6 +194,10 @@ public class ShooterSubsystem extends SubsystemBase {
         return startEnd(() -> spinFeeder(vel), this::stopFeeder);
     }
 
+    public Command spinFeederNotRequiring(double vel) {
+        return Commands.startEnd(() -> spinFeeder(vel), this::stopFeeder);
+    }
+
     public Command spinFeederMaxAndStop() {
         return spinFeederAndStop(-1);
     }
