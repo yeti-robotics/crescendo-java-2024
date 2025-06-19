@@ -32,7 +32,9 @@ import frc.robot.util.controllerUtils.ControllerContainer;
 import frc.robot.util.controllerUtils.MultiButton;
 
 
-public class RobotContainer {
+public class
+
+RobotContainer {
 
     public final ShooterSubsystem shooter = new ShooterSubsystem();
     public final PivotSubsystem pivot = new PivotSubsystem();
@@ -47,7 +49,8 @@ public class RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.1)
             .withRotationalDeadband(CommandSwerveDrivetrain.MaFxAngularRate * 0.1) // Add a 10% deadband
-            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
+            .
+            withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
 
     public ControllerContainer controllerContainer = new ControllerContainer();
     ButtonHelper buttonHelper = new ButtonHelper(controllerContainer.getControllers());
@@ -110,7 +113,7 @@ public class RobotContainer {
         buttonHelper.createButton(6, 0, shooter.spinFeederAndStop(-.1).alongWith(intake.rollIn(0.5)), MultiButton.RunCondition.WHILE_HELD);
         buttonHelper.createButton(9, 0, elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.AMP).andThen(pivot.moveDown(-0.25).unless(
                         () -> pivot.getEncoderAngle() < 0.4).withTimeout(0.6).andThen(pivot.adjustPivotPositionTo(0.03).unless(() -> !elevator.getMagSwitch()))), MultiButton.RunCondition.WHEN_PRESSED);
-        intake.intakeOccupiedTrigger.onTrue(
+        joystick.povDown().onTrue(
                 vision.blinkLimelight()
                         .andThen(robotCommands.handoff())
                         .alongWith(successfulIntakeRumble()));
@@ -130,7 +133,7 @@ public class RobotContainer {
                 ));
 
         // Hardcode to a fine shooting angle
-        joystick.leftTrigger().whileTrue(pivot.adjustPivotPositionTo(0.46).alongWith(shooter.setVelocityAndStop(150)).alongWith(shooter.spinFeederNotRequiring(-1)));
+        joystick.leftTrigger().whileTrue(shooter.setVelocityAndStop(75));
         //         joystick.b().whileTrue(robotCommands.bumpFire());
         joystick.b().whileTrue(shooter.spinFeederNotRequiring(-1));
 
@@ -147,6 +150,8 @@ public class RobotContainer {
         // Suck in note
         joystick.rightBumper().whileTrue(intake.rollIn(.7));
 
+        joystick.b().whileTrue(shooter.spinFeederAndStop(0.15));
+
         // Arm down
         joystick.leftBumper().onTrue(arm.deployArm(0.5).alongWith(pivot.movePivotPositionTo(PivotSubsystem.PivotConstants.PivotPosition.HANDOFF)));
 
@@ -154,13 +159,14 @@ public class RobotContainer {
         joystick.a().onTrue(robotCommands.setAmp());
 
         // Shoot
-        joystick.rightTrigger().whileTrue(shooter.spinFeederMaxAndStop().alongWith(intake.rollOut(-1)));
+        joystick.rightTrigger().whileTrue(shooter.spinFeederMaxAndStop());
         // Handoff
         joystick.povUp().onTrue(robotCommands.handoff().withTimeout(2));
         // Move elevator down
-        joystick.povDown().onTrue(elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.DOWN));
+//        joystick.povDown().onTrue(elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.DOWN));
         // (These are also unassigned on the gamepad map?)
-        joystick.povLeft().whileTrue(pivot.moveUpWithBrake(0.05, -0.01));
+        joystick.povLeft().whileTrue(pivot.moveUpWithBrake(0.05, -0.02));
+
         joystick.povRight().whileTrue(pivot.moveDownWithBrake(-0.05, 0.01));
         // Spin feeder[]
 
