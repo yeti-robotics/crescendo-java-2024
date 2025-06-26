@@ -63,7 +63,7 @@ public class RobotCommands {
         return pivot.movePivotPositionTo(PivotSubsystem.PivotConstants.PivotPosition.HANDOFF).andThen(
                 arm.moveUpAndStop(.5).until(() ->
                         arm.getEnc() >= ArmSubsystem.ArmConstants.ARM_HANDOFF_POSITION).andThen(
-                        shooter.spinFeederAndStop(-0.3).alongWith(intake.rollOut(-0.15))
+                        shooter.spinFeederAndStop(-0.2).alongWith(intake.rollOut(-0.2))
                 ).until(shooter::getBeamBreak)
         );
     }

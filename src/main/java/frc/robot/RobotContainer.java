@@ -32,9 +32,7 @@ import frc.robot.util.controllerUtils.ControllerContainer;
 import frc.robot.util.controllerUtils.MultiButton;
 
 
-public class
-
-RobotContainer {
+public class RobotContainer {
 
     public final ShooterSubsystem shooter = new ShooterSubsystem();
     public final PivotSubsystem pivot = new PivotSubsystem();
@@ -49,8 +47,7 @@ RobotContainer {
     private final SwerveRequest.FieldCentric drive = new SwerveRequest.FieldCentric()
             .withDeadband(CommandSwerveDrivetrain.MAX_VELOCITY_METERS_PER_SECOND * 0.1)
             .withRotationalDeadband(CommandSwerveDrivetrain.MaFxAngularRate * 0.1) // Add a 10% deadband
-            .
-            withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
+            .withDriveRequestType(SwerveModule.DriveRequestType.OpenLoopVoltage); // I want field-centric
 
     public ControllerContainer controllerContainer = new ControllerContainer();
     ButtonHelper buttonHelper = new ButtonHelper(controllerContainer.getControllers());
@@ -133,9 +130,9 @@ RobotContainer {
                 ));
 
         // Hardcode to a fine shooting angle
-        joystick.leftTrigger().whileTrue(shooter.setVelocityAndStop(75));
+        joystick.leftTrigger().whileTrue(shooter.setVelocityAndStop(150));
         //         joystick.b().whileTrue(robotCommands.bumpFire());
-        joystick.b().whileTrue(shooter.spinFeederNotRequiring(-1));
+        joystick.b().whileTrue(shooter.spinFeederNotRequiring(1));
 
 
         // Lock on to shuttle target
@@ -150,8 +147,6 @@ RobotContainer {
         // Suck in note
         joystick.rightBumper().whileTrue(intake.rollIn(.7));
 
-        joystick.b().whileTrue(shooter.spinFeederAndStop(0.15));
-
         // Arm down
         joystick.leftBumper().onTrue(arm.deployArm(0.5).alongWith(pivot.movePivotPositionTo(PivotSubsystem.PivotConstants.PivotPosition.HANDOFF)));
 
@@ -161,13 +156,15 @@ RobotContainer {
         // Shoot
         joystick.rightTrigger().whileTrue(shooter.spinFeederMaxAndStop());
         // Handoff
+
+
         joystick.povUp().onTrue(robotCommands.handoff().withTimeout(2));
         // Move elevator down
 //        joystick.povDown().onTrue(elevator.setPositionTo(ElevatorSubsystem.ElevatorConstants.ElevatorPositions.DOWN));
         // (These are also unassigned on the gamepad map?)
         joystick.povLeft().whileTrue(pivot.moveUpWithBrake(0.05, -0.02));
 
-        joystick.povRight().whileTrue(pivot.moveDownWithBrake(-0.05, 0.01));
+        joystick.povRight().whileTrue(pivot.moveDownWithBrake(-0.05, 0.02));
         // Spin feeder[]
 
     }
