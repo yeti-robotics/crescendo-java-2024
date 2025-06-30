@@ -67,6 +67,7 @@
       "/SmartDashboard/Elevator motor": "Motor Controller",
       "/SmartDashboard/Field": "Field2d",
       "/SmartDashboard/Forward limit switch pivot": "Digital Input",
+      "/SmartDashboard/Mechanisms/Shooter": "Mechanism2d",
       "/SmartDashboard/Module 0": "Mechanism2d",
       "/SmartDashboard/Module 1": "Mechanism2d",
       "/SmartDashboard/Module 2": "Mechanism2d",
@@ -94,7 +95,15 @@
         "left": 150,
         "right": 2961,
         "top": 79,
-        "width": 16.541748046875
+        "width": 16.541748046875,
+        "window": {
+          "visible": true
+        }
+      },
+      "/SmartDashboard/Mechanisms/Shooter": {
+        "window": {
+          "visible": true
+        }
       }
     }
   },
@@ -112,7 +121,8 @@
   "NetworkTables Info": {
     "Connections": {
       "open": true
-    }
+    },
+    "visible": true
   },
   "NetworkTables View": {
     "visible": false

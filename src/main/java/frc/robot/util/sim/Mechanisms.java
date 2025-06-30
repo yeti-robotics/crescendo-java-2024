@@ -75,6 +75,7 @@ public class Mechanisms {
                                 new Color8Bit(Color.kBlue)
                         ));
     }
+    @Logged(name="Shooter")
     public Mechanism2d getShooter() {
         return elevatorShooterMech;
     }
