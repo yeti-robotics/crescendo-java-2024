@@ -20,9 +20,11 @@ import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
 import frc.robot.util.RobotDataPublisher;
 import frc.robot.util.RobotDataPublisher.RobotDataSubscription;
 import frc.robot.util.ShooterStateData;
+import frc.robot.util.sim.PhysicsSim;
 import frc.robot.util.sim.SimulatableMechanism;
 
 public class ShooterSubsystem extends SubsystemBase implements SimulatableMechanism {
@@ -121,6 +123,11 @@ public class ShooterSubsystem extends SubsystemBase implements SimulatableMechan
         motionMagicConfigs.MotionMagicJerk = 4000;
         rightMotorConfigurator.apply(rightMotorConfiguration);
         leftMotorConfigurator.apply(rightMotorConfiguration);
+
+        if (Robot.isSimulation()) {
+            PhysicsSim.getInstance().addTalonFX(leftKraken);
+            PhysicsSim.getInstance().addTalonFX(rightKraken);
+        }
     }
 
     @Override

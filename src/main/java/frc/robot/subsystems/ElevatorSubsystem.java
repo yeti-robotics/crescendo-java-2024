@@ -15,6 +15,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.util.sim.PhysicsSim;
 import frc.robot.util.sim.SimulatableMechanism;
 
 public class ElevatorSubsystem extends SubsystemBase implements SimulatableMechanism {
@@ -75,8 +77,9 @@ public class ElevatorSubsystem extends SubsystemBase implements SimulatableMecha
 
         elConfigurator.apply(talonFXConfiguration);
         elevatorMotor.setNeutralMode(NeutralModeValue.Brake);
-
-
+        if (Robot.isSimulation()) {
+            PhysicsSim.getInstance().addTalonFX(elevatorMotor);
+        }
     }
 
     public void goDown(double speed) {

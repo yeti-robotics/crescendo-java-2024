@@ -11,6 +11,8 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Robot;
+import frc.robot.util.sim.PhysicsSim;
 import frc.robot.util.sim.SimulatableMechanism;
 
 public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism {
@@ -140,6 +142,9 @@ public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism 
         cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
         armEncoderConfigurator.apply(ArmConstants.canconderconfigs);
 
+        if (Robot.isSimulation()) {
+            PhysicsSim.getInstance().addTalonFX(armKraken, armEncoder);
+        }
     }
 
     @Override
