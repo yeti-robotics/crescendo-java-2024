@@ -27,18 +27,65 @@ public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism 
         public static final NeutralModeValue ARM_NEUTRAL_MODE = NeutralModeValue.Brake;
             public static final double ARM_POSITION_STATUS_FRAME = 0.05;
         public static final double ARM_VELOCITY_STATUS_FRAME = 0.01;
-        public static final double ARM_HANDOFF_POSITION = 0.51;
+        public static final double ARM_HANDOFF_POSITION = 0.429;
         public static final double ARM_DEPLOY_UPPER_BOUND = 0.04;
+        static final double ARM_DEPLOY_LOWER_BOUND = -0.01;
 
-        public static final double ARM_P = 0;
-        public static final double ARM_I = 0;
-        public static final double ARM_D = 0;
-        public static final double ARM_DEPLOY_LOWER_BOUND = -0.01;
+        static final double P_VALUE = 256;
+        static final double I_VALUE = 0;
+        static final double D_VALUE = 192;
+        static final double A_VALUE = 9;
+        static final double G_VALUE = 11;
+        static final double S_VALUE = 0;
+        static final double V_VALUE = 0;
 
-        public static final Slot0Configs SLOT_0_CONFIGS = new Slot0Configs().withKP(ARM_P).withKI(ARM_I).withKD(ARM_D).withGravityType(GravityTypeValue.Arm_Cosine);
-        public static final CurrentLimitsConfigs ARM_CURRENT_LIMIT = new CurrentLimitsConfigs().withSupplyCurrentLimitEnable(true).
-                withSupplyCurrentLimit(65).withStatorCurrentLimitEnable(true).withStatorCurrentLimit(65);
+        static final Slot0Configs slot0Configs = new Slot0Configs()
+                .withGravityType(GravityTypeValue.Arm_Cosine)
+                .withKA(A_VALUE)
+                .withKD(D_VALUE)
+                .withKG(G_VALUE)
+                .withKI(I_VALUE)
+                .withKP(P_VALUE)
+                .withKS(S_VALUE)
+                .withKV(V_VALUE);
 
+        static final MotorOutputConfigs motorOutputConfigs = new MotorOutputConfigs()
+                .withNeutralMode(NeutralModeValue.Brake)
+                .withInverted(InvertedValue.CounterClockwise_Positive);
+
+        static final MotionMagicConfigs motionMagicConfigs = new MotionMagicConfigs()
+                .withMotionMagicCruiseVelocity(2.75)
+                .withMotionMagicJerk(0)
+                .withMotionMagicAcceleration(2.75);
+
+
+        static final CurrentLimitsConfigs currentLimitsConfigs = new CurrentLimitsConfigs()
+                .withStatorCurrentLimitEnable(true)
+                .withStatorCurrentLimit(50)
+                .withSupplyCurrentLimitEnable(true)
+                .withSupplyCurrentLimit(50);
+
+
+        static final CANcoderConfiguration canconderconfigs = new CANcoderConfiguration()
+                .withMagnetSensor(
+                        new MagnetSensorConfigs()
+                                .withMagnetOffset(0.442138671875)
+                                .withSensorDirection(SensorDirectionValue.CounterClockwise_Positive)
+                                .withAbsoluteSensorDiscontinuityPoint(.5)
+                );
+
+        static final TalonFXConfiguration talonFXConfigs = new TalonFXConfiguration()
+                .withSlot0(slot0Configs)
+                .withMotionMagic(motionMagicConfigs)
+                .withMotorOutput(motorOutputConfigs)
+                .withCurrentLimits(currentLimitsConfigs)
+                .withFeedback(
+                        new FeedbackConfigs()
+                                .withFeedbackRemoteSensorID(ARM_CANCODER_ID)
+                                .withFeedbackSensorSource(FeedbackSensorSourceValue.FusedCANcoder)
+                                .withRotorToSensorRatio(60)
+                                .withSensorToMechanismRatio(1)
+                );
         public static final SoftwareLimitSwitchConfigs ARM_SOFT_LIMIT = new SoftwareLimitSwitchConfigs().
                 withForwardSoftLimitEnable
                         (true).
@@ -79,11 +126,11 @@ public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism 
         talonFXConfiguration.FutureProofConfigs = Constants.TalonFXConstants.TALON_FUTURE_PROOF;
         talonFXConfiguration.Feedback.SensorToMechanismRatio = 50; //placeholder
         talonFXConfiguration.Feedback.RotorToSensorRatio = 12.8;
-        talonFXConfiguration.CurrentLimits = ArmConstants.ARM_CURRENT_LIMIT;
+        talonFXConfiguration.CurrentLimits = ArmConstants.currentLimitsConfigs;
         //talonFXConfiguration.SoftwareLimitSwitch = ArmConstants.ARM_SOFT_LIMIT;
-        talonFXConfiguration.Slot0 = ArmConstants.SLOT_0_CONFIGS;
+        talonFXConfiguration.Slot0 = ArmConstants.slot0Configs;
 
-        armConfigurator.apply(talonFXConfiguration);
+        armConfigurator.apply(ArmConstants.talonFXConfigs);
 
         var armEncoderConfigurator = armEncoder.getConfigurator();
         var cancoderConfiguration = new CANcoderConfiguration();
@@ -91,7 +138,7 @@ public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism 
         cancoderConfiguration.MagnetSensor.AbsoluteSensorDiscontinuityPoint = 1;
         cancoderConfiguration.MagnetSensor.MagnetOffset = ArmConstants.MAGNET_OFFSET;
         cancoderConfiguration.MagnetSensor.SensorDirection = SensorDirectionValue.CounterClockwise_Positive;
-        armEncoderConfigurator.apply(cancoderConfiguration);
+        armEncoderConfigurator.apply(ArmConstants.canconderconfigs);
 
     }
 
