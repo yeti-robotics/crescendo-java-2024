@@ -30,6 +30,7 @@ import frc.robot.subsystems.drivetrain.generated.TunerConstants;
 import frc.robot.util.controllerUtils.ButtonHelper;
 import frc.robot.util.controllerUtils.ControllerContainer;
 import frc.robot.util.controllerUtils.MultiButton;
+import frc.robot.util.sim.Mechanisms;
 
 
 public class RobotContainer {
@@ -54,6 +55,8 @@ public class RobotContainer {
     private boolean autoNeedsRebuild = true;
     private Command auto;
 
+    private final Mechanisms mechanisms;
+
     private final RobotCommands robotCommands = new RobotCommands(intake, pivot, shooter, drivetrain, arm, elevator);
 
     public RobotContainer() {
@@ -65,6 +68,7 @@ public class RobotContainer {
         ));
 
         var field = new Field2d();
+        mechanisms = new Mechanisms();
         SmartDashboard.putData("Field", field);
 
         PathPlannerLogging.setLogCurrentPoseCallback(field::setRobotPose);
@@ -209,6 +213,21 @@ public class RobotContainer {
             System.out.println("AUTO NAME: " + auto);
             autoNeedsRebuild = false;
         }
+    }
+
+    public void updateMechanisms() {
+        mechanisms.publishComponentPoses(
+                elevator.getCurrentPosition(),
+                shooter.getCurrentPosition(),
+                intake.getCurrentPosition(),
+                true);
+        mechanisms.publishComponentPoses(
+                elevator.getCurrentPosition(),
+                shooter.getCurrentPosition(),
+                intake.getCurrentPosition(),
+                false);
+        mechanisms.updateShooter(
+               elevator.getCurrentPosition(), arm.getCurrentPosition());
     }
 
     public Command getAutonomousCommand() {

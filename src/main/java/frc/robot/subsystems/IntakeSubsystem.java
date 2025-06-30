@@ -4,14 +4,17 @@ import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants;
+import frc.robot.util.sim.SimulatableMechanism;
 
-public class IntakeSubsystem extends SubsystemBase {
+public class IntakeSubsystem extends SubsystemBase implements SimulatableMechanism {
 
     private final TalonFX intakeKraken;
     private final DigitalInput beamBreak;
@@ -45,6 +48,16 @@ public class IntakeSubsystem extends SubsystemBase {
     public void periodic() {
         SmartDashboard.putData("intake kraken", intakeKraken);
         SmartDashboard.putData("intake beam break", beamBreak);
+    }
+
+    @Override
+    public Angle getCurrentPosition() {
+        return intakeKraken.getPosition().getValue();
+    }
+
+    @Override
+    public Angle getTargetPosition() {
+        return Units.Rotations.of(intakeKraken.getClosedLoopReference().getValue());
     }
 
     private void setIntakeSpeed(double speed) {

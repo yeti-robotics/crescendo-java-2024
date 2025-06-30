@@ -11,6 +11,8 @@ import com.ctre.phoenix6.signals.InvertedValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
 import edu.wpi.first.math.interpolation.InterpolatingTreeMap;
 import edu.wpi.first.math.interpolation.InverseInterpolator;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
@@ -21,8 +23,9 @@ import frc.robot.Constants;
 import frc.robot.util.RobotDataPublisher;
 import frc.robot.util.RobotDataPublisher.RobotDataSubscription;
 import frc.robot.util.ShooterStateData;
+import frc.robot.util.sim.SimulatableMechanism;
 
-public class ShooterSubsystem extends SubsystemBase {
+public class ShooterSubsystem extends SubsystemBase implements SimulatableMechanism {
 
     private final TalonFX leftKraken;
     private final TalonFX rightKraken;
@@ -64,6 +67,8 @@ public class ShooterSubsystem extends SubsystemBase {
 
         public static final int SHOOTER_NEO = 16;
         public static final int BEAM_BREAK = 5;
+
+
 
         public static InterpolatingTreeMap<Double, ShooterStateData> SHOOTER_MAP() {
             InterpolatingTreeMap<Double, ShooterStateData> map = new InterpolatingTreeMap<>(InverseInterpolator.forDouble(), ShooterStateData.interpolator);
@@ -116,6 +121,16 @@ public class ShooterSubsystem extends SubsystemBase {
         motionMagicConfigs.MotionMagicJerk = 4000;
         rightMotorConfigurator.apply(rightMotorConfiguration);
         leftMotorConfigurator.apply(rightMotorConfiguration);
+    }
+
+    @Override
+    public Angle getCurrentPosition() {
+        return leftKraken.getPosition().getValue();
+    }
+
+    @Override
+    public Angle getTargetPosition() {
+        return Units.Rotations.of(leftKraken.getClosedLoopReference().getValue());
     }
 
     @Override

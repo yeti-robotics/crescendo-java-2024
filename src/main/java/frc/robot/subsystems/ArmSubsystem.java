@@ -5,12 +5,15 @@ import com.ctre.phoenix6.configs.*;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.*;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.util.sim.SimulatableMechanism;
 
-public class ArmSubsystem extends SubsystemBase {
+public class ArmSubsystem extends SubsystemBase implements SimulatableMechanism {
 
     private final TalonFX armKraken;
     private final CANcoder armEncoder;
@@ -95,6 +98,16 @@ public class ArmSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         SmartDashboard.putNumber("Arm encoder: ", armEncoder.getAbsolutePosition().getValue().magnitude());
+    }
+
+    @Override
+    public Angle getCurrentPosition() {
+        return armEncoder.getAbsolutePosition().getValue();
+    }
+
+    @Override
+    public Angle getTargetPosition() {
+        return Units.Rotations.of(armKraken.getClosedLoopReference().getValue());
     }
 
     public double getEnc() {

@@ -8,13 +8,16 @@ import com.ctre.phoenix6.controls.MotionMagicExpoVoltage;
 import com.ctre.phoenix6.hardware.TalonFX;
 import com.ctre.phoenix6.signals.GravityTypeValue;
 import com.ctre.phoenix6.signals.NeutralModeValue;
+import edu.wpi.first.units.Units;
+import edu.wpi.first.units.measure.Angle;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.util.sim.SimulatableMechanism;
 
-public class ElevatorSubsystem extends SubsystemBase {
+public class ElevatorSubsystem extends SubsystemBase implements SimulatableMechanism {
     private final TalonFX elevatorMotor;
     private final DigitalInput magSwitch;
     private static ElevatorConstants.ElevatorPositions elevatorPosition = ElevatorConstants.ElevatorPositions.DOWN;
@@ -89,6 +92,16 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     // why do we have two of these methods????
+
+    @Override
+    public Angle getCurrentPosition() {
+        return elevatorMotor.getPosition().getValue();
+    }
+
+    @Override
+    public Angle getTargetPosition() {
+        return Units.Rotations.of(elevatorMotor.getClosedLoopReference().getValue());
+    }
 
     private void setPosition(ElevatorConstants.ElevatorPositions position) {
         elevatorPosition = position;
