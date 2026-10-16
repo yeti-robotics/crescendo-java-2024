@@ -82,6 +82,6 @@ public class Constants {
 
     public class TalonFXConstants{
         public static final boolean TALON_FUTURE_PROOF = true;
-        public static final CANBus CANIVORE_NAME = new CANBus("canivore");
+        public static final CANBus CANIVORE_NAME = new CANBus("canivoreBus");
     }
 }

@@ -138,9 +138,6 @@ public class RobotContainer {
         // Lock on to shuttle target
         joystick.y().whileTrue(new ShuttleAimCommand(drivetrain, () -> -joystick.getLeftY(), () -> -joystick.getLeftX()).alongWith(intake.rollOut(-0.3).withTimeout(0.2).andThen(robotCommands.setShuttleState())));
 
-        // Swerve lock
-        joystick.x().onTrue(robotCommands.stowAmp());
-
         // Reset the field-centric heading
         joystick.start().onTrue(drivetrain.runOnce(drivetrain::seedFieldCentric));
 
@@ -149,9 +146,6 @@ public class RobotContainer {
 
         // Arm down
         joystick.leftBumper().onTrue(arm.deployArm(0.5).alongWith(pivot.movePivotPositionTo(PivotSubsystem.PivotConstants.PivotPosition.HANDOFF)));
-
-        // Amp Toggle
-        joystick.a().onTrue(robotCommands.setAmp());
 
         // Shoot
         joystick.rightTrigger().whileTrue(shooter.spinFeederMaxAndStop());
